@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Sistema Especialista - Diagnóstico BIOS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-3 mt-md-5 px-3 px-md-4">
+    <div class="card shadow p-3 p-md-4">
+        <h2 class="text-center mb-3 mb-md-4">Sistema Especialista de Diagnóstico de Beeps da BIOS</h2>
+
+        <form method="POST" id="diagnosticoForm">
+            <!-- Seletor de Método de Inferência -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">Método de Inferência:</label>
+                <select name="metodo_inferencia" id="metodoInferenciaSelect" class="form-select">
+                    <option value="backward" {% if metodo_inferencia == 'backward' %}selected{% endif %}>
+                        Encadeamento para Trás (Backward Chaining)
+                    </option>
+                    <option value="forward" {% if metodo_inferencia == 'forward' %}selected{% endif %}>
+                        Encadeamento para Frente (Forward Chaining)
+                    </option>
+                    <option value="hibrido" {% if metodo_inferencia == 'hibrido' %}selected{% endif %}>
+                        Híbrido (Backward + Forward)
+                    </option>
+                </select>
+                <small class="text-muted">
+                    <strong>Backward:</strong> Encontra regras que correspondem aos fatos fornecidos.<br>
+                    <strong>Forward:</strong> Deduz novos fatos a partir de conclusões, criando uma cadeia de raciocínio.<br>
+                    <strong>Híbrido:</strong> Combina ambos os métodos para diagnósticos mais completos.
+                </small>
+            </div>
+
+            <!-- Seletor de Fabricante -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">Selecione o fabricante da sua placa-mãe (BIOS):</label>
+                <select name="fabricante" id="fabricanteSelect" class="form-select">
+                    <option value="">-- Selecione um fabricante --</option>
+                    {% for codigo, nome in fabricantes.items() %}
+                    <option value="{{ codigo }}" {% if fabricante_selecionado == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">Selecione o fabricante para ver apenas os beeps compatíveis</small>
+            </div>
+
+            <!-- Seção de Beeps -->
+            <div class="categoria-titulo">
+                🔊 Beeps da BIOS
+            </div>
+            <div id="bipesContainer" class="bipes-container {% if fabricante_selecionado %}show{% endif %}">
+                {% if bipes_disponiveis %}
+                <div class="row">
+                    {% for fato, descricao in bipes_disponiveis.items() %}
+                    <div class="col-12 col-md-6 mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="form-check flex-grow-1">
+                                <input class="form-check-input" type="checkbox" name="fatos" value="{{ fato }}" id="fato_{{ loop.index }}">
+                                <label class="form-check-label" for="fato_{{ loop.index }}">
+                                    <strong>{{ formatar_nome_fato(fato) }}</strong>
+                                </label>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary ms-2 flex-shrink-0" onclick="tocarBeep('{{ fato }}')" title="Ouvir beep">
+                                🔊
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    Selecione um fabricante de BIOS acima para ver os beeps disponíveis.
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Seção de Outros Erros -->
+            <div class="categoria-titulo">
+                ⚠️ Outros Problemas e Erros
+            </div>
+            <div class="erros-container show">
+                {% if outros_erros %}
+                <div class="row">
+                    {% for fato, descricao in outros_erros.items() %}
+                    <div class="col-12 col-md-6 mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="fatos" value="{{ fato }}" id="erro_{{ loop.index }}">
+                            <label class="form-check-label" for="erro_{{ loop.index }}">
+                                <strong>{{ formatar_nome_fato(fato) }}</strong>
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-primary mt-4 w-100">Diagnosticar</button>
+        </form>
+
+        {% if fatos_selecionados %}
+        <div class="mt-4">
+            <h5>Fatos selecionados:</h5>
+            <div class="alert alert-info">
+                {% for fato_formatado in fatos_formatados %}
+                    <span class="badge bg-primary me-1 mb-1">{{ fato_formatado }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if diagnostico %}
+        <div class="mt-4">
+            <h4>Diagnóstico:</h4>
+            
+            <!-- Informações do Método -->
+            {% if diagnostico.metodo %}
+            <div class="alert alert-info mb-3">
+                <strong>Método utilizado:</strong> 
+                {% if diagnostico.metodo == 'backward' %}
+                    Encadeamento para Trás (Backward Chaining)
+                {% elif diagnostico.metodo == 'forward' %}
+                    Encadeamento para Frente (Forward Chaining)
+                    {% if diagnostico.iteracoes %}
+                        - <strong>{{ diagnostico.iteracoes }}</strong> iteração(ões)
+                    {% endif %}
+                {% elif diagnostico.metodo == 'hibrido' %}
+                    Híbrido (Backward + Forward Chaining)
+                    {% if diagnostico.iteracoes %}
+                        - <strong>{{ diagnostico.iteracoes }}</strong> iteração(ões) no forward
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Fatos Iniciais e Derivados (apenas para forward/híbrido) -->
+            {% if diagnostico.fatos_iniciais or diagnostico.fatos_derivados %}
+            <div class="mb-3">
+                {% if diagnostico.fatos_iniciais %}
+                <div class="mb-2">
+                    <strong>Fatos Iniciais:</strong>
+                    <div class="mt-1">
+                        {% for fato in diagnostico.fatos_iniciais %}
+                            <span class="badge bg-primary me-1 mb-1">{{ formatar_nome_fato(fato) }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if diagnostico.fatos_derivados %}
+                <div class="mb-2">
+                    <strong>Fatos Derivados:</strong>
+                    <div class="mt-1">
+                        {% for fato in diagnostico.fatos_derivados %}
+                            <span class="badge bg-success me-1 mb-1">{{ formatar_nome_fato(fato) }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Diagnósticos -->
+            <div class="diagnosticos-container">
+            {% for d in diagnostico.diagnosticos %}
+                <div class="card mb-3 diagnostico-card {% if d.is_critico %}critico{% endif %}">
+                    <div class="card-body">
+                        {{ d.html|safe }}
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='beep_player.js') }}"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

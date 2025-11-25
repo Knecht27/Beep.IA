@@ -1,0 +1,18 @@
+
+<!DOCTYPE html>
+<html><body>
+<h1>Resultado</h1>
+<h2>Fatos</h2>
+<ul>
+{% for k,v in facts.items() %}
+<li>{{k}}: {{v}}</li>
+{% endfor %}
+</ul>
+<h2>Justificativas</h2>
+<ul>
+{% for j in justifications %}
+<li>{{j}}</li>
+{% endfor %}
+</ul>
+<a href="/">Voltar</a>
+</body></html>
