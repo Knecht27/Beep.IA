@@ -1,6 +1,3 @@
-"""Base de Conhecimento - Sistema Especialista de Diagnóstico de Beeps da BIOS 
-Contém as regras de produção e fatos do domínio de diagnóstico de problemas de computador"""
-
 # Fabricantes de BIOS suportados
 FABRICANTES_BIOS = {
     'ami': 'AMI (American Megatrends)',
@@ -145,14 +142,11 @@ OUTROS_ERROS = {
     'ruido_estranho': 'Ruído estranho vindo do computador'
 }
 
-# Função auxiliar para obter todos os beeps de um fabricante
+
 def obter_bipes_fabricante(fabricante):
-    """Retorna os beeps disponíveis para um fabricante específico"""
     return BIPES_POR_FABRICANTE.get(fabricante, {})
 
-# Função auxiliar para obter todos os fatos (para compatibilidade)
 def obter_todos_fatos():
-    """Retorna todos os fatos disponíveis (beeps + outros erros)"""
     todos = {}
     for fabricante_bipes in BIPES_POR_FABRICANTE.values():
         todos.update(fabricante_bipes)
@@ -160,7 +154,6 @@ def obter_todos_fatos():
     return todos
 
 # Mapeamento de conclusões para fatos derivados (para forward chaining)
-# Este mapeamento ajuda o sistema a identificar quais conclusões podem gerar novos fatos
 MAPEAMENTO_CONCLUSAO_FATO = {
     'problema_memoria_ram': [
         'Erro de memória RAM',
@@ -193,15 +186,6 @@ MAPEAMENTO_CONCLUSAO_FATO = {
 }
 
 def extrair_fatos_da_conclusao(conclusao):
-    """
-    Extrai fatos derivados de uma conclusão baseado no mapeamento.
-    
-    Args:
-        conclusao: Texto da conclusão
-        
-    Returns:
-        Lista de fatos extraídos
-    """
     fatos_extraidos = []
     conclusao_lower = conclusao.lower()
     
@@ -214,8 +198,6 @@ def extrair_fatos_da_conclusao(conclusao):
     
     return fatos_extraidos
 
-# Regras de produção (condições -> conclusão)
-# Formato: ({conjunto de condições}, 'conclusão')
 REGRAS = [
     # Regras relacionadas a beeps da BIOS - AMI
     ({'bipes_1_curto'}, 'POST bem-sucedido - Sistema funcionando normalmente. O computador passou por todos os testes de inicialização sem erros. Nenhuma ação necessária.'),
