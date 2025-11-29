@@ -35,6 +35,8 @@ Beep.IA/
 - Python 3.7 ou superior
 - Flask
 - Navegador web moderno
+- Gunicorn
+
 
 ## Instalação
 

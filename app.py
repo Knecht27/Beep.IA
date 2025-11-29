@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from motorInferencia import MotorInferencia
 from baseDeRegras import FABRICANTES_BIOS, BIPES_POR_FABRICANTE, OUTROS_ERROS, obter_bipes_fabricante
 import re
+import os
 
 app = Flask(__name__)
 motor = MotorInferencia()
@@ -205,4 +206,5 @@ def api_bipes(fabricante):
     return jsonify(bipes)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
