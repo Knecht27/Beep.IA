@@ -1,4 +1,5 @@
-from baseDeRegras import REGRAS, extrair_fatos_da_conclusao
+from core.domain.regras import REGRAS
+from core.domain.mapeamento import extrair_fatos_da_conclusao
 
 class MotorInferencia:
     def __init__(self, regras=None):

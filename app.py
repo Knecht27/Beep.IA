@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
-from motorInferencia import MotorInferencia
-from baseDeRegras import FABRICANTES_BIOS, BIPES_POR_FABRICANTE, OUTROS_ERROS, obter_bipes_fabricante
+from core.inference.motor_inferencia import MotorInferencia
+from core.domain.dados import FABRICANTES_BIOS, BIPES_POR_FABRICANTE, OUTROS_ERROS, obter_bipes_fabricante
+from core.utils.justificativa import formatar_justificativa_html
 import re
 import os
 
@@ -26,13 +27,13 @@ def formatar_diagnostico(texto, is_critico=False):
                 causas_solucoes = resto.split(separador, 1)
                 causas = causas_solucoes[0].strip()
                 if causas:
-                    partes_formatadas.append('<p class="fw-bold text-warning mb-2">⚠️ Possíveis causas:</p>')
+                    partes_formatadas.append('<p class="fw-bold text-warning mb-2">Possíveis causas:</p>')
                     partes_formatadas.append(f'<p class="mb-3 ms-3">{causas}</p>')
                 
                 if len(causas_solucoes) > 1:
                     solucoes = causas_solucoes[1].strip()
                     if solucoes:
-                        label = '🚨 Ações imediatas:' if 'Ações imediatas:' in resto else '✅ Soluções:'
+                        label = 'Ações imediatas:' if 'Ações imediatas:' in resto else 'Soluções:'
                         classe_label = 'fw-bold text-danger mb-2' if is_critico else 'fw-bold text-success mb-2'
                         partes_formatadas.append(f'<p class="{classe_label}">{label}</p>')
                         solucoes_formatadas = formatar_lista_numerada(solucoes)
@@ -40,7 +41,7 @@ def formatar_diagnostico(texto, is_critico=False):
             else:
                 causas = resto.strip()
                 if causas:
-                    partes_formatadas.append('<p class="fw-bold text-warning mb-2">⚠️ Possíveis causas:</p>')
+                    partes_formatadas.append('<p class="fw-bold text-warning mb-2">Possíveis causas:</p>')
                     partes_formatadas.append(f'<p class="mb-3 ms-3">{causas}</p>')
     elif 'Soluções:' in texto or 'Ações imediatas:' in texto:
         separador = 'Ações imediatas:' if 'Ações imediatas:' in texto else 'Soluções:'
@@ -52,7 +53,7 @@ def formatar_diagnostico(texto, is_critico=False):
         if len(partes) > 1:
             solucoes = partes[1].strip()
             if solucoes:
-                label = '🚨 Ações imediatas:' if 'Ações imediatas:' in texto else '✅ Soluções:'
+                label = 'Ações imediatas:' if 'Ações imediatas:' in texto else 'Soluções:'
                 classe_label = 'fw-bold text-danger mb-2' if is_critico else 'fw-bold text-success mb-2'
                 partes_formatadas.append(f'<p class="{classe_label}">{label}</p>')
                 solucoes_formatadas = formatar_lista_numerada(solucoes)
@@ -162,11 +163,13 @@ def index():
                     'is_critico': is_critico
                 })
             
+            fatos_iniciais = resultado.get('fatos_iniciais', fatos)
             diagnostico = {
                 'diagnosticos': diagnosticos_formatados,
                 'metodo': metodo_inferencia,
                 'justificativas': resultado.get('justificativas', []),
-                'fatos_iniciais': resultado.get('fatos_iniciais', fatos),
+                'justificativa_html': formatar_justificativa_html(resultado, fatos_iniciais, formatar_nome_fato),
+                'fatos_iniciais': fatos_iniciais,
                 'fatos_derivados': resultado.get('fatos_derivados', []),
                 'arvore_deducao': resultado.get('arvore_deducao', []),
                 'iteracoes': resultado.get('iteracoes', 0)

@@ -1,8 +1,4 @@
-// JavaScript para o Sistema Especialista de Diagnóstico de Beeps da BIOS
 
-/**
- * Filtra os beeps disponíveis baseado no fabricante selecionado
- */
 function filtrarBipes() {
     const fabricante = document.getElementById('fabricanteSelect').value;
     const bipesContainer = document.getElementById('bipesContainer');
@@ -12,7 +8,6 @@ function filtrarBipes() {
         fetch(`/api/bipes/${fabricante}`)
             .then(response => response.json())
             .then(data => {
-                // Limpa checkboxes de beeps existentes
                 const form = document.getElementById('diagnosticoForm');
                 const existingBipes = form.querySelectorAll('input[name="fatos"][id^="fato_"]');
                 existingBipes.forEach(cb => {
@@ -22,7 +17,6 @@ function filtrarBipes() {
                     }
                 });
                 
-                // Adiciona novos checkboxes
                 const bipesDiv = bipesContainer.querySelector('.row') || document.createElement('div');
                 if (!bipesContainer.querySelector('.row')) {
                     bipesDiv.className = 'row';
@@ -43,7 +37,7 @@ function filtrarBipes() {
                                 </label>
                             </div>
                             <button type="button" class="btn btn-sm btn-outline-secondary ms-2 flex-shrink-0" onclick="tocarBeep('${fato}')" title="Ouvir beep">
-                                🔊
+                                Ouvir
                             </button>
                         </div>
                     `;
@@ -62,39 +56,28 @@ function filtrarBipes() {
     }
 }
 
-/**
- * Formata o nome do fato para exibição mais legível
- * Ex: 'bipes_1_longo_2_curto' -> 'Beeps: 1 longo, 2 curtos'
- * 
- * @param {string} fato - Nome do fato a ser formatado
- * @returns {string} Nome formatado
- */
+
 function formatarNomeFato(fato) {
     if (fato.startsWith('bipes_')) {
         const resto = fato.substring(6);
         
-        // Casos especiais
         if (resto === 'continuos') return 'Beeps: contínuos';
         if (resto === 'continuos_curtos') return 'Beeps: curtos contínuos';
         if (resto === '1_curto') return 'Beeps: 1 curto';
         if (resto === '1_longo') return 'Beeps: 1 longo';
         if (resto === 'sem_bipes') return 'Sem beeps';
         
-        // Padrão: números e palavras
         const partes = resto.split('_');
         
-        // Verifica se é padrão Phoenix (1_1_1, 1_1_2, etc.) - todos são números
         if (partes.length >= 3 && partes.every(p => /^\d+$/.test(p))) {
             return `Beeps: ${partes.join('-')}`;
         }
         
-        // Processa padrão normal: número + tipo
         const resultado = [];
         let i = 0;
         
         while (i < partes.length) {
             if (/^\d+$/.test(partes[i])) {
-                // É um número, pega o próximo como tipo
                 if (i + 1 < partes.length) {
                     const tipo = partes[i + 1];
                     if (tipo === 'longo') {
@@ -122,29 +105,22 @@ function formatarNomeFato(fato) {
         }
     }
     
-    // Para outros erros, apenas formata melhor
     return fato.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
 
-// Instância global do BeepPlayer
 const beepPlayer = new BeepPlayer();
 
-/**
- * Função wrapper para manter compatibilidade com o código existente
- * @param {string} fato - Nome do fato/beep a ser reproduzido
- */
+
 async function tocarBeep(fato) {
     await beepPlayer.tocarBeep(fato);
 }
 
-// Inicialização quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', function() {
-    // Adiciona event listener ao select de fabricante
+
     const fabricanteSelect = document.getElementById('fabricanteSelect');
     if (fabricanteSelect) {
         fabricanteSelect.addEventListener('change', filtrarBipes);
         
-        // Carrega beeps se já houver fabricante selecionado
         const fabricante = fabricanteSelect.value;
         if (fabricante) {
             filtrarBipes();

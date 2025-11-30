@@ -17,17 +17,32 @@ Sistema especialista em suporte técnico na área de TI feito em Python. O Beep.
 
 ```
 Beep.IA/
-├── app.py                 # Aplicação Flask principal
-├── motorInferencia.py     # Motor de inferência (sistema especialista)
-├── baseDeRegras.py        # Base de conhecimento com regras e fatos
-├── templates/
-│   ├── index.html         # Página principal
-│   └── result.html        # Página de resultados
-├── static/
-│   ├── style.css          # Estilos CSS
-│   ├── script.js          # JavaScript principal
-│   └── beep_player.js     # Player de beeps
-└── README.md
+├── app.py                      # Aplicação Flask principal
+├── requirements.txt           # Dependências do projeto
+├── Procfile                   # Configuração para deploy (Heroku)
+├── .runtime.txt              # Versão do Python
+├── README.md                 # Documentação principal
+│
+├── core/                      # Módulo principal do sistema
+│   ├── domain/               # Conhecimento do domínio
+│   │   ├── dados.py         # Fabricantes, beeps e outros erros
+│   │   ├── regras.py        # Regras de diagnóstico
+│   │   └── mapeamento.py    # Mapeamento para forward chaining
+│   │
+│   ├── inference/            # Motor de inferência
+│   │   └── motor_inferencia.py  # Backward, Forward e Híbrido
+│   │
+│   └── utils/                # Utilitários
+│       └── justificativa.py    # Formatação de justificativas
+│
+├── templates/                # Templates HTML (Jinja2)
+│   ├── index.html
+│   └── result.html
+│
+└── static/                   # Arquivos estáticos
+    ├── style.css
+    ├── script.js
+    └── beep_player.js
 ```
 
 ## Requisitos
