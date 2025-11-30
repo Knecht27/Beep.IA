@@ -2,17 +2,6 @@
 
 Sistema especialista em suporte técnico na área de TI feito em Python. O Beep.IA é uma aplicação web que utiliza técnicas de inteligência artificial (sistemas especialistas) para diagnosticar problemas de hardware de computadores baseado em códigos de beeps da BIOS e outros sintomas.
 
-## Funcionalidades
-
-- **Diagnóstico de Beeps da BIOS**: Suporta múltiplos fabricantes (AMI, Award, Phoenix, Dell, ASUS, GIGABYTE, MSI, HP/Compaq, IBM)
-- **Múltiplos Métodos de Inferência**:
-  - Encadeamento para trás (Backward Chaining)
-  - Encadeamento para frente (Forward Chaining)
-  - Encadeamento híbrido (combinação de ambos)
-- **Diagnóstico de Outros Problemas**: Detecta problemas como superaquecimento, tela azul, travamentos, etc.
-- **Interface Web Amigável**: Interface moderna e responsiva com Bootstrap
-- **Reprodução de Beeps**: Permite ouvir os padrões de beeps para facilitar a identificação
-
 ## Estrutura do Projeto
 
 ```
@@ -89,4 +78,4 @@ http://localhost:5000
 
 ## Licença
 
-Este projeto é de código aberto e está disponível para uso educacional e comercial.
+Este projeto é de código aberto. 
