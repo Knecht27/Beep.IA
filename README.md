@@ -72,9 +72,6 @@ http://localhost:5000
 
 - **Backend**: Python, Flask
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap
-- **IA**: Sistemas Especialistas (Rule-Based Systems)
-- **Métodos de Inferência**: Backward Chaining, Forward Chaining
-
 
 ## Licença
 
