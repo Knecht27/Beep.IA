@@ -8,7 +8,7 @@ Sistema especialista em suporte técnico na área de TI feito em Python. O Beep.
 Beep.IA/
 ├── app.py                      # Aplicação Flask principal
 ├── requirements.txt           # Dependências do projeto
-├── Procfile                   # Configuração para deploy (Heroku)
+├── Procfile                   # Configuração para deploy (Render)
 ├── .runtime.txt              # Versão do Python
 ├── README.md                 # Documentação principal
 │
